@@ -37,7 +37,7 @@ contract Pausable is Ownable {
     //  1) create a private '_paused' variable of type bool
     bool private _paused;
     //  2) create a public setter using the inherited onlyOwner modifier 
-    function setPaused(bool isPaused) onlyOwner {
+    function setPaused(bool isPaused) public onlyOwner {
         _paused = isPaused;
     }
     //  3) create an internal constructor that sets the _paused variable to false
@@ -153,14 +153,13 @@ contract ERC721 is Pausable, ERC165 {
     function approve(address to, uint256 tokenId) public {
         
         // TODO require the given address to not be the owner of the tokenId
-        address currentOwner = ownerOf(to);
-        require(to != currentOwner, "Transfer address is the same as the token owner");
+        require(to != _tokenOwner[tokenId], "Transfer address is the same as the token owner");
         // TODO require the msg sender to be the owner of the contract or isApprovedForAll() to be true
-        require(owner == msg.sender || isApprovedForAll(_owner, msg.sender), "Approval is not successful");
+        require(_owner == msg.sender || isApprovedForAll(_owner, msg.sender), "Approval is not successful");
         // TODO add 'to' address to token approvals
         _tokenApprovals[tokenId] = to;
         // TODO emit Approval Event
-        Approval(to, msg.sender, tokenId);
+        emit Approval(to, msg.sender, tokenId);
     }
 
     function getApproved(uint256 tokenId) public view returns (address) {
@@ -505,7 +504,7 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
 
 
     // TODO: Create an internal function to set the tokenURI of a specified tokenId
-    function _setTokenURI(uint256 tokenId) {
+    function _setTokenURI(uint256 tokenId) internal{
         // require the token exists before setting
         require(_exists(tokenId), "Token does not exist");
         // It should be the _baseTokenURI + the tokenId in string form
@@ -525,7 +524,7 @@ contract JToken is ERC721Metadata("J Token", "JT" , "https://s3-us-west-2.amazon
     //      -can only be executed by the contract owner
     //      -takes in a 'to' address, tokenId, and tokenURI as parameters
     //      -returns a true boolean upon completion of the function
-    function mint (address to, uint256 tokenId, string tokenURI) public onlyOwner() returns(bool) {
+    function mint (address to, uint256 tokenId) public onlyOwner() returns(bool) {
         //      -calls the superclass mint and setTokenURI functions
         _mint(to, tokenId);
         _setTokenURI(tokenId);
