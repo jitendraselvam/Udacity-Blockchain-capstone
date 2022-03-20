@@ -12,9 +12,8 @@ contract('TestSolnSquareVerifier', accounts => {
             let proofs = Object.values(zokratesProof.proof);
             let inputs = zokratesProof.inputs;
             let tx = await this.contract.addSolution(accounts[1], 1, ...proofs, inputs, {from: accounts[0]});
-            let verifiedEevent = tx.logs[0].event;
-            let addedEvent = tx.logs[1].event;
-            assert.equal(verifiedEevent, 'Verified', 'Invalid event');
+            //console.log("!@#$" + JSON.stringify(tx));
+            let addedEvent = tx.logs[0].event;
             assert.equal(addedEvent, 'SolutionAdded', 'Invalid event'); 
         });
         // Test if an ERC721 token can be minted for contract - SolnSquareVerifier
